@@ -19,16 +19,13 @@ def parse_book_title(html_page):
 def download_txt(url, filename, params=None, folder='books/'):
     response = requests.get(url, params)
     response.raise_for_status()
-    try:
-        check_for_redirect(response)
-        save_path = "{}.txt".format(
-            os.path.join(folder, sanitize_filename(filename))
-        )
-        with open(save_path, "w") as file:
-            file.write(response.text)
-        return save_path
-    except requests.HTTPError:
-        pass
+
+    save_path = "{}.txt".format(
+        os.path.join(folder, sanitize_filename(filename))
+    )
+    with open(save_path, "w") as file:
+        file.write(response.text)
+    return save_path
 
 
 def main():
@@ -42,8 +39,12 @@ def main():
 
         response = requests.get(book_url)
         response.raise_for_status()
-        title = parse_book_title(response.text)
-        download_txt(book_text_url, f"{book_id}. {title}")
+        try:
+            check_for_redirect(response)
+            title = parse_book_title(response.text)
+            download_txt(book_text_url, f"{book_id}. {title}")
+        except requests.HTTPError:
+            pass
 
 
 if __name__ == "__main__":
