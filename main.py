@@ -1,5 +1,5 @@
 import os
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, unquote
 
 import requests
 from bs4 import BeautifulSoup
@@ -35,10 +35,24 @@ def download_txt(url, filename, params=None, folder='books/'):
     return save_path
 
 
+def download_image(url, params=None, folder='images/'):
+    response = requests.get(url, params)
+    response.raise_for_status()
+
+    parsed_url = urlparse(unquote(url))
+
+    save_path = os.path.join(folder, os.path.basename(parsed_url.path))
+    with open(save_path, "wb") as file:
+        file.write(response.content)
+    return save_path
+
+
 def main():
     books_dir = "books"
+    images_dir = "images"
 
     os.makedirs(books_dir, exist_ok=True)
+    os.makedirs(images_dir, exist_ok=True)
 
     for book_id in range(1, 11):
         book_url = f"http://tululu.org/b{book_id}/"
@@ -53,6 +67,7 @@ def main():
                 response.url, parse_book_cover_url(response.text)
             )
             download_txt(book_text_url, f"{book_id}. {title}")
+            download_image(cover_url)
         except requests.HTTPError:
             pass
 
