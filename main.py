@@ -1,10 +1,18 @@
 import os
+
+from bs4 import BeautifulSoup
 import requests
 
 
 def check_for_redirect(response):
     if response.history:
         raise requests.HTTPError
+
+
+def parse_book_title(html_page):
+    soup = BeautifulSoup(html_page, "lxml")
+    title, author = soup.find("h1").text.split("::")
+    return title.strip()
 
 
 def main():
