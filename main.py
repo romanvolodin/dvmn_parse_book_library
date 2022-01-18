@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
@@ -14,6 +15,12 @@ def parse_book_title(html_page):
     soup = BeautifulSoup(html_page, "lxml")
     title, *_ = soup.find("h1").text.split("::")
     return title.strip()
+
+
+def parse_book_cover_url(html_page):
+    soup = BeautifulSoup(html_page, "lxml")
+    cover = soup.find("div", class_="bookimage").find("a").find("img")["src"]
+    return cover
 
 
 def download_txt(url, filename, params=None, folder='books/'):
@@ -42,6 +49,9 @@ def main():
         try:
             check_for_redirect(response)
             title = parse_book_title(response.text)
+            cover_url = urljoin(
+                response.url, parse_book_cover_url(response.text)
+            )
             download_txt(book_text_url, f"{book_id}. {title}")
         except requests.HTTPError:
             pass
