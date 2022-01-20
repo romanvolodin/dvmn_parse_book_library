@@ -1,9 +1,31 @@
+import argparse
 import os
 from urllib.parse import urljoin, urlparse, unquote
 
 import requests
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Скрипт для скачивания книг с сайта tululu.org",
+    )
+    parser.add_argument(
+        "-s",
+        "--start_id",
+        type=int,
+        default=1,
+        help="Начиная с какого ID скачивать книги. По умолчанию: 1",
+    )
+    parser.add_argument(
+        "-e",
+        "--end_id",
+        type=int,
+        default=10,
+        help="По какой ID скачивать книги. По умолчанию: 10",
+    )
+    return parser.parse_args()
 
 
 def check_for_redirect(response):
@@ -70,6 +92,8 @@ def save_comments(filename, comment_texts, folder='comments/'):
 
 
 def main():
+    args = parse_arguments()
+
     books_dir = "books"
     images_dir = "images"
     comments_dir = "comments"
@@ -78,7 +102,7 @@ def main():
     os.makedirs(images_dir, exist_ok=True)
     os.makedirs(comments_dir, exist_ok=True)
 
-    for book_id in range(1, 11):
+    for book_id in range(args.start_id, args.end_id + 1):
         book_url = f"http://tululu.org/b{book_id}/"
         book_text_url = f"https://tululu.org/txt.php?id={book_id}"
 
