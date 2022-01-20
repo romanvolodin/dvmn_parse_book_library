@@ -108,19 +108,20 @@ def main():
 
         response = requests.get(book_url)
         response.raise_for_status()
+
         try:
             check_for_redirect(response)
-            book = parse_book_page(response.text)
-            cover_url = urljoin(response.url, book["relative_cover_url"])
-            download_txt(book_text_url, f"{book_id}. {book['title']}.txt")
-            download_image(cover_url)
-            if book["comments"]:
-                save_comments(
-                    f"{book_id}. {book['title']}.txt", book["comments"]
-                )
-
         except requests.HTTPError:
-            pass
+            continue
+
+        book = parse_book_page(response.text)
+        cover_url = urljoin(response.url, book["relative_cover_url"])
+        download_txt(book_text_url, f"{book_id}. {book['title']}.txt")
+        download_image(cover_url)
+        if book["comments"]:
+            save_comments(
+                f"{book_id}. {book['title']}.txt", book["comments"]
+            )
 
 
 if __name__ == "__main__":
