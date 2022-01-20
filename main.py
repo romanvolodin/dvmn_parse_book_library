@@ -23,6 +23,15 @@ def parse_book_cover_url(html_page):
     return cover
 
 
+def parse_book_comment_texts(html_page):
+    comment_texts = []
+    soup = BeautifulSoup(html_page, "lxml")
+    comments = soup.find_all("div", class_="texts")
+    for comment in comments:
+        comment_texts.append(comment.find("span", class_="black").text)
+    return comment_texts
+
+
 def download_txt(url, filename, params=None, folder='books/'):
     response = requests.get(url, params)
     response.raise_for_status()
@@ -47,12 +56,21 @@ def download_image(url, params=None, folder='images/'):
     return save_path
 
 
+def save_comments(filename, comment_texts, folder='comments/'):
+    save_path = os.path.join(folder, filename)
+    with open(save_path, "w") as file:
+        file.write('\n\n'.join(comment_texts))
+    return save_path
+
+
 def main():
     books_dir = "books"
     images_dir = "images"
+    comments_dir = "comments"
 
     os.makedirs(books_dir, exist_ok=True)
     os.makedirs(images_dir, exist_ok=True)
+    os.makedirs(comments_dir, exist_ok=True)
 
     for book_id in range(1, 11):
         book_url = f"http://tululu.org/b{book_id}/"
@@ -66,8 +84,13 @@ def main():
             cover_url = urljoin(
                 response.url, parse_book_cover_url(response.text)
             )
+            comments = parse_book_comment_texts(response.text)
+
             download_txt(book_text_url, f"{book_id}. {title}")
             download_image(cover_url)
+            if comments:
+                save_comments(f"{book_id}. {title}.txt", comments)
+
         except requests.HTTPError:
             pass
 
