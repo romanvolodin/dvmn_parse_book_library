@@ -32,6 +32,12 @@ def parse_book_comment_texts(html_page):
     return comment_texts
 
 
+def parse_book_genres(html_page):
+    soup = BeautifulSoup(html_page, "lxml")
+    genres = soup.find("span", class_="d_book").find_all("a")
+    return [genre.text for genre in genres]
+
+
 def download_txt(url, filename, params=None, folder='books/'):
     response = requests.get(url, params)
     response.raise_for_status()
