@@ -62,7 +62,7 @@ def parse_book_page(html_page):
     }
 
 
-def download_txt(url, filename, params=None, folder='books/'):
+def download_txt(url, filename, params=None, folder="books/"):
     response = requests.get(url, params)
     response.raise_for_status()
 
@@ -72,7 +72,7 @@ def download_txt(url, filename, params=None, folder='books/'):
     return save_path
 
 
-def download_image(url, params=None, folder='images/'):
+def download_image(url, params=None, folder="images/"):
     response = requests.get(url, params)
     response.raise_for_status()
 
@@ -84,10 +84,10 @@ def download_image(url, params=None, folder='images/'):
     return save_path
 
 
-def save_comments(filename, comment_texts, folder='comments/'):
+def save_comments(filename, comment_texts, folder="comments/"):
     save_path = os.path.join(folder, filename)
     with open(save_path, "w") as file:
-        file.write('\n\n'.join(comment_texts))
+        file.write("\n\n".join(comment_texts))
     return save_path
 
 
