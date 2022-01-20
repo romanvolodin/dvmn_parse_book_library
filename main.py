@@ -47,6 +47,16 @@ def parse_book_comment_texts(soup):
     return [comment.find("span", class_="black").text for comment in comments]
 
 
+def parse_book_download_link(soup):
+    download_txt = soup.find(text='скачать txt')
+    if download_txt is None:
+        return
+    tag = download_txt.parent
+    if tag.name != "a":
+        return
+    return tag["href"]
+
+
 def parse_book_genres(soup):
     genres = soup.find("span", class_="d_book").find_all("a")
     return [genre.text for genre in genres]
@@ -54,12 +64,17 @@ def parse_book_genres(soup):
 
 def parse_book_page(html_page):
     soup = BeautifulSoup(html_page, "lxml")
-    return {
+    book = {
         "title": parse_book_title(soup),
         "genres": parse_book_genres(soup),
         "relative_cover_url": parse_book_cover_url(soup),
+        "relative_download_url": None,
         "comments": parse_book_comment_texts(soup),
     }
+    relative_download_url = parse_book_download_link(soup)
+    if relative_download_url:
+        book["relative_download_url"] = relative_download_url
+    return book
 
 
 def download_txt(url, filename, params=None, folder="books/"):
@@ -105,7 +120,6 @@ def main():
 
     for book_id in range(args.start_id, args.end_id + 1):
         book_url = f"http://tululu.org/b{book_id}/"
-        book_text_url = f"https://tululu.org/txt.php?id={book_id}"
 
         response = requests.get(book_url)
         response.raise_for_status()
@@ -117,11 +131,11 @@ def main():
 
         book = parse_book_page(response.text)
 
-        try:
-            download_txt(book_text_url, f"{book_id}. {book['title']}.txt")
-        except requests.HTTPError:
+        if book["relative_download_url"] is None:
             continue
-
+        
+        download_url = urljoin(response.url, book["relative_download_url"])
+        download_txt(download_url, f"{book_id}. {book['title']}.txt")
         cover_url = urljoin(response.url, book["relative_cover_url"])
         download_image(cover_url)
         if book["comments"]:
