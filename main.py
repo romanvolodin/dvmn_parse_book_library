@@ -11,31 +11,33 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def parse_book_title(html_page):
-    soup = BeautifulSoup(html_page, "lxml")
+def parse_book_title(soup):
     title, *_ = soup.find("h1").text.split("::")
     return title.strip()
 
 
-def parse_book_cover_url(html_page):
-    soup = BeautifulSoup(html_page, "lxml")
-    cover = soup.find("div", class_="bookimage").find("a").find("img")["src"]
-    return cover
+def parse_book_cover_url(soup):
+    return soup.find("div", class_="bookimage").find("a").find("img")["src"]
 
 
-def parse_book_comment_texts(html_page):
-    comment_texts = []
-    soup = BeautifulSoup(html_page, "lxml")
+def parse_book_comment_texts(soup):
     comments = soup.find_all("div", class_="texts")
-    for comment in comments:
-        comment_texts.append(comment.find("span", class_="black").text)
-    return comment_texts
+    return [comment.find("span", class_="black").text for comment in comments]
 
 
-def parse_book_genres(html_page):
-    soup = BeautifulSoup(html_page, "lxml")
+def parse_book_genres(soup):
     genres = soup.find("span", class_="d_book").find_all("a")
     return [genre.text for genre in genres]
+
+
+def parse_book_page(html_page):
+    soup = BeautifulSoup(html_page, "lxml")
+    return {
+        "title": parse_book_title(soup),
+        "genres": parse_book_genres(soup),
+        "relative_cover_url": parse_book_cover_url(soup),
+        "comments": parse_book_comment_texts(soup),
+    }
 
 
 def download_txt(url, filename, params=None, folder='books/'):
@@ -86,16 +88,14 @@ def main():
         response.raise_for_status()
         try:
             check_for_redirect(response)
-            title = parse_book_title(response.text)
-            cover_url = urljoin(
-                response.url, parse_book_cover_url(response.text)
-            )
-            comments = parse_book_comment_texts(response.text)
-
-            download_txt(book_text_url, f"{book_id}. {title}")
+            book = parse_book_page(response.text)
+            cover_url = urljoin(response.url, book["relative_cover_url"])
+            download_txt(book_text_url, f"{book_id}. {book['title']}")
             download_image(cover_url)
-            if comments:
-                save_comments(f"{book_id}. {title}.txt", comments)
+            if book["comments"]:
+                save_comments(
+                    f"{book_id}. {book['title']}.txt", book["comments"]
+                )
 
         except requests.HTTPError:
             pass
