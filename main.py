@@ -44,9 +44,7 @@ def download_txt(url, filename, params=None, folder='books/'):
     response = requests.get(url, params)
     response.raise_for_status()
 
-    save_path = "{}.txt".format(
-        os.path.join(folder, sanitize_filename(filename))
-    )
+    save_path = os.path.join(folder, sanitize_filename(filename))
     with open(save_path, "w") as file:
         file.write(response.text)
     return save_path
@@ -90,7 +88,7 @@ def main():
             check_for_redirect(response)
             book = parse_book_page(response.text)
             cover_url = urljoin(response.url, book["relative_cover_url"])
-            download_txt(book_text_url, f"{book_id}. {book['title']}")
+            download_txt(book_text_url, f"{book_id}. {book['title']}.txt")
             download_image(cover_url)
             if book["comments"]:
                 save_comments(
