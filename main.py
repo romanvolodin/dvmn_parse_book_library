@@ -62,18 +62,18 @@ def parse_book_genres(soup):
     return [genre.text for genre in genres]
 
 
-def parse_book_page(html_page):
+def parse_book_page(html_page, base_url):
     soup = BeautifulSoup(html_page, "lxml")
     book = {
         "title": parse_book_title(soup),
         "genres": parse_book_genres(soup),
-        "relative_cover_url": parse_book_cover_url(soup),
-        "relative_download_url": None,
+        "cover_url": urljoin(base_url, parse_book_cover_url(soup)),
+        "download_url": None,
         "comments": parse_book_comment_texts(soup),
     }
-    relative_download_url = parse_book_download_link(soup)
-    if relative_download_url:
-        book["relative_download_url"] = relative_download_url
+    download_url = parse_book_download_link(soup)
+    if download_url:
+        book["download_url"] = urljoin(base_url, download_url)
     return book
 
 
@@ -129,15 +129,13 @@ def main():
         except requests.HTTPError:
             continue
 
-        book = parse_book_page(response.text)
+        book = parse_book_page(response.text, response.url)
 
-        if book["relative_download_url"] is None:
+        if book["download_url"] is None:
             continue
-        
-        download_url = urljoin(response.url, book["relative_download_url"])
-        download_txt(download_url, f"{book_id}. {book['title']}.txt")
-        cover_url = urljoin(response.url, book["relative_cover_url"])
-        download_image(cover_url)
+
+        download_txt(book["download_url"], f"{book_id}. {book['title']}.txt")
+        download_image(book["cover_url"])
         if book["comments"]:
             save_comments(
                 f"{book_id}. {book['title']}.txt", book["comments"]
