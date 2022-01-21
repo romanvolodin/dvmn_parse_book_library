@@ -116,7 +116,11 @@ def main():
         except requests.HTTPError:
             continue
 
-        download_image(book["cover_url"])
+        try:
+            download_image(book["cover_url"])
+        except requests.HTTPError:
+            pass
+
         if book["comments"]:
             save_comments(
                 f"{book_id}. {book['title']}.txt", book["comments"]
