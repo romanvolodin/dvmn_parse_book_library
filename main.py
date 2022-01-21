@@ -49,7 +49,7 @@ def parse_book_comment_texts(soup):
 
 def parse_book_download_link(soup):
     download_txt = soup.find(text='скачать txt')
-    if download_txt is None:
+    if not download_txt:
         return
     tag = download_txt.parent
     if tag.name != "a":
@@ -131,7 +131,7 @@ def main():
 
         book = parse_book_page(response.text, response.url)
 
-        if book["download_url"] is None:
+        if not book["download_url"]:
             continue
 
         download_txt(book["download_url"], f"{book_id}. {book['title']}.txt")
