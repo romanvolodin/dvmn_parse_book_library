@@ -36,7 +36,7 @@ def check_for_redirect(response):
 def parse_book_page(html_page, base_url):
     soup = BeautifulSoup(html_page, "lxml")
 
-    title, *_ = soup.find("h1").text.split("::").strip()
+    title, *_ = soup.find("h1").text.split("::")
 
     genres = soup.find("span", class_="d_book").find_all("a")
 
@@ -47,7 +47,7 @@ def parse_book_page(html_page, base_url):
     comments = soup.find_all("div", class_="texts")
 
     return {
-        "title": title,
+        "title": title.strip(),
         "genres": [genre.text for genre in genres],
         "cover_url": urljoin(base_url, cover_url),
         "comments": [
