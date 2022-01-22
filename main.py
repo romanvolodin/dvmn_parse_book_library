@@ -106,12 +106,7 @@ def main():
 
         try:
             check_for_redirect(response)
-        except requests.HTTPError:
-            continue
-
-        book = parse_book_page(response.text, response.url)
-
-        try:
+            book = parse_book_page(response.text, response.url)
             download_txt(book_download_url, f"{book_id}. {book['title']}")
         except requests.HTTPError:
             continue
