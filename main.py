@@ -108,13 +108,9 @@ def main():
             check_for_redirect(response)
             book = parse_book_page(response.text, response.url)
             download_txt(book_download_url, f"{book_id}. {book['title']}")
-        except requests.HTTPError:
-            continue
-
-        try:
             download_image(book["cover_url"])
         except requests.HTTPError:
-            pass
+            continue
 
         if book["comments"]:
             save_comments(
