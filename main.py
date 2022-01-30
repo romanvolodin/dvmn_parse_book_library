@@ -26,6 +26,28 @@ def parse_arguments():
         default=702,
         help="По какую страницу скачивать книги (не включительно). По умолчанию: 702",
     )
+    parser.add_argument(
+        "--dest_folder",
+        type=str,
+        default=".",
+        help="Путь в каталогу с результатами парсинга. По умолчанию: . (текущий каталог)",
+    )
+    parser.add_argument(
+        "--skip_imgs",
+        action="store_true",
+        help="Пропустить скачивание картинок.",
+    )
+    parser.add_argument(
+        "--skip_txt",
+        action="store_true",
+        help="Пропустить скачивание книг.",
+    )
+    parser.add_argument(
+        "--json_path",
+        type=str,
+        default="./book.json",
+        help="Путь к JSON-файлу с результатами. По умолчанию: ./book.json",
+    )
     return parser.parse_args()
 
 
@@ -104,14 +126,16 @@ def save_comments(filename, comment_texts, folder="comments/"):
 def main():
     args = parse_arguments()
 
-    books_dir = "books"
-    images_dir = "images"
-    book_database_filepath = "books.json"
+    books_dir = f"{args.dest_folder}/books"
+    images_dir = f"{args.dest_folder}/images"
+    book_database_filepath = f"{args.dest_folder}/{args.json_path}"
 
     book_database = []
 
-    os.makedirs(books_dir, exist_ok=True)
-    os.makedirs(images_dir, exist_ok=True)
+    if not args.skip_txt:
+        os.makedirs(books_dir, exist_ok=True)
+    if not args.skip_imgs:
+        os.makedirs(images_dir, exist_ok=True)
 
     for page in range(args.start_page, args.end_page):
         scifi_books_url = f"http://tululu.org/l55/{page}"
@@ -136,10 +160,16 @@ def main():
             try:
                 check_for_redirect(response)
                 book = parse_book_page(response.text, response.url)
-                book_filepath = download_txt(
-                    book_download_url, f"{book_id}. {book['title']}.txt"
-                )
-                cover_filepath = download_image(book["cover_url"])
+                if not args.skip_txt:
+                    book_filepath = download_txt(
+                        book_download_url,
+                        f"{book_id}. {book['title']}.txt",
+                        folder=books_dir,
+                    )
+                if not args.skip_imgs:
+                    cover_filepath = download_image(
+                        book["cover_url"], folder=images_dir
+                    )
             except requests.HTTPError:
                 continue
 
