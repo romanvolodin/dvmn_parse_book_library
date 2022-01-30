@@ -37,20 +37,20 @@ def check_for_redirect(response):
 def parse_book_page(html_page, base_url):
     soup = BeautifulSoup(html_page, "lxml")
 
-    title, author = soup.find("h1").text.split("::")
+    title, author = soup.select_one("h1").text.split("::")
 
-    genres = soup.find("span", class_="d_book").find_all("a")
+    genres = soup.select("span.d_book a")
 
-    cover_url = soup.find("div", class_="bookimage").find("a").find("img")["src"]
+    cover_url = soup.select_one(".bookimage a img")["src"]
 
-    comments = soup.find_all("div", class_="texts")
+    comments = soup.select(".texts")
 
     return {
         "title": title.strip(),
         "author": author.strip(),
         "genres": [genre.text for genre in genres],
         "cover_url": urljoin(base_url, cover_url),
-        "comments": [comment.find("span", class_="black").text for comment in comments],
+        "comments": [comment.select_one(".black").text for comment in comments],
     }
 
 
@@ -59,14 +59,12 @@ def parse_category_page(html_page, base_url):
 
     soup = BeautifulSoup(html_page, "lxml")
 
-    book_cards = soup.find("div", id="content").find_all("table", class_="d_book")
-    for book_card in book_cards:
-        book_url_row = book_card.find_all("tr")[1]
-        book_relative_url = book_url_row.find("a")["href"]
+    book_links = soup.select("#content .d_book tr:nth-of-type(2) a")
+    for book_link in book_links:
         book_urls.append(
             {
-                "url": urljoin(base_url, book_relative_url),
-                "id": int(book_relative_url.replace("/", "").replace("b", "")),
+                "url": urljoin(base_url, book_link["href"]),
+                "id": int(book_link["href"].replace("/", "").replace("b", "")),
             }
         )
 
