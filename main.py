@@ -14,17 +14,17 @@ def parse_arguments():
     )
     parser.add_argument(
         "-s",
-        "--start_id",
+        "--start_page",
         type=int,
         default=1,
-        help="Начиная с какого ID скачивать книги. По умолчанию: 1",
+        help="Начиная с какой страницы скачивать книги. По умолчанию: 1",
     )
     parser.add_argument(
         "-e",
-        "--end_id",
+        "--end_page",
         type=int,
-        default=10,
-        help="По какой ID скачивать книги. По умолчанию: 10",
+        default=702,
+        help="По какую страницу скачивать книги (не включительно). По умолчанию: 702",
     )
     return parser.parse_args()
 
@@ -113,7 +113,7 @@ def main():
     os.makedirs(books_dir, exist_ok=True)
     os.makedirs(images_dir, exist_ok=True)
 
-    for page in range(1, 2):
+    for page in range(args.start_page, args.end_page):
         scifi_books_url = f"http://tululu.org/l55/{page}"
         response = requests.get(scifi_books_url)
         response.raise_for_status()
