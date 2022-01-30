@@ -40,9 +40,7 @@ def parse_book_page(html_page, base_url):
 
     genres = soup.find("span", class_="d_book").find_all("a")
 
-    cover_url = soup.find(
-        "div", class_="bookimage"
-    ).find("a").find("img")["src"]
+    cover_url = soup.find("div", class_="bookimage").find("a").find("img")["src"]
 
     comments = soup.find_all("div", class_="texts")
 
@@ -50,9 +48,7 @@ def parse_book_page(html_page, base_url):
         "title": title.strip(),
         "genres": [genre.text for genre in genres],
         "cover_url": urljoin(base_url, cover_url),
-        "comments": [
-            comment.find("span", class_="black").text for comment in comments
-        ],
+        "comments": [comment.find("span", class_="black").text for comment in comments],
     }
 
 
@@ -113,9 +109,7 @@ def main():
             continue
 
         if book["comments"]:
-            save_comments(
-                f"{book_id}. {book['title']}.txt", book["comments"]
-            )
+            save_comments(f"{book_id}. {book['title']}.txt", book["comments"])
 
 
 if __name__ == "__main__":
