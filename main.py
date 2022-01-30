@@ -45,8 +45,8 @@ def parse_arguments():
     parser.add_argument(
         "--json_path",
         type=str,
-        default="./book.json",
-        help="Путь к JSON-файлу с результатами. По умолчанию: ./book.json",
+        default="./books.json",
+        help="Путь к JSON-файлу с результатами. По умолчанию: ./books.json",
     )
     return parser.parse_args()
 
