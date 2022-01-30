@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 from urllib.parse import unquote, urljoin, urlparse
 
@@ -36,7 +37,7 @@ def check_for_redirect(response):
 def parse_book_page(html_page, base_url):
     soup = BeautifulSoup(html_page, "lxml")
 
-    title, *_ = soup.find("h1").text.split("::")
+    title, author = soup.find("h1").text.split("::")
 
     genres = soup.find("span", class_="d_book").find_all("a")
 
@@ -46,10 +47,30 @@ def parse_book_page(html_page, base_url):
 
     return {
         "title": title.strip(),
+        "author": author.strip(),
         "genres": [genre.text for genre in genres],
         "cover_url": urljoin(base_url, cover_url),
         "comments": [comment.find("span", class_="black").text for comment in comments],
     }
+
+
+def parse_category_page(html_page, base_url):
+    book_urls = []
+
+    soup = BeautifulSoup(html_page, "lxml")
+
+    book_cards = soup.find("div", id="content").find_all("table", class_="d_book")
+    for book_card in book_cards:
+        book_url_row = book_card.find_all("tr")[1]
+        book_relative_url = book_url_row.find("a")["href"]
+        book_urls.append(
+            {
+                "url": urljoin(base_url, book_relative_url),
+                "id": int(book_relative_url.replace("/", "").replace("b", "")),
+            }
+        )
+
+    return book_urls
 
 
 def download_txt(url, filename, params=None, folder="books/"):
@@ -87,29 +108,56 @@ def main():
 
     books_dir = "books"
     images_dir = "images"
-    comments_dir = "comments"
+    book_database_filepath = "books.json"
+
+    book_database = []
 
     os.makedirs(books_dir, exist_ok=True)
     os.makedirs(images_dir, exist_ok=True)
-    os.makedirs(comments_dir, exist_ok=True)
 
-    for book_id in range(args.start_id, args.end_id + 1):
-        book_url = f"http://tululu.org/b{book_id}/"
-        book_download_url = f"http://tululu.org/txt.php?id={book_id}/"
-
-        response = requests.get(book_url)
+    for page in range(1, 2):
+        scifi_books_url = f"http://tululu.org/l55/{page}"
+        response = requests.get(scifi_books_url)
         response.raise_for_status()
 
         try:
             check_for_redirect(response)
-            book = parse_book_page(response.text, response.url)
-            download_txt(book_download_url, f"{book_id}. {book['title']}")
-            download_image(book["cover_url"])
         except requests.HTTPError:
             continue
 
-        if book["comments"]:
-            save_comments(f"{book_id}. {book['title']}.txt", book["comments"])
+        category_book_urls = parse_category_page(response.text, response.url)
+
+        for category_book in category_book_urls:
+            book_url = category_book["url"]
+            book_id = category_book["id"]
+            book_download_url = f"http://tululu.org/txt.php?id={book_id}/"
+
+            response = requests.get(book_url)
+            response.raise_for_status()
+
+            try:
+                check_for_redirect(response)
+                book = parse_book_page(response.text, response.url)
+                book_filepath = download_txt(
+                    book_download_url, f"{book_id}. {book['title']}.txt"
+                )
+                cover_filepath = download_image(book["cover_url"])
+            except requests.HTTPError:
+                continue
+
+            book_database.append(
+                {
+                    "title": book["title"],
+                    "author": book["author"],
+                    "img_src": cover_filepath,
+                    "book_path": book_filepath,
+                    "comments": book["comments"],
+                    "genres": book["genres"],
+                }
+            )
+
+    with open(book_database_filepath, "w") as file:
+        json.dump(book_database, file, ensure_ascii=False)
 
 
 if __name__ == "__main__":
