@@ -116,13 +116,6 @@ def download_image(url, params=None, folder="images/"):
     return save_path
 
 
-def save_comments(filename, comment_texts, folder="comments/"):
-    save_path = os.path.join(folder, filename)
-    with open(save_path, "w") as file:
-        file.write("\n\n".join(comment_texts))
-    return save_path
-
-
 def main():
     args = parse_arguments()
 
