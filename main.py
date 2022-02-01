@@ -145,7 +145,8 @@ def main():
         for category_book in category_book_urls:
             book_url = category_book["url"]
             book_id = category_book["id"]
-            book_download_url = f"http://tululu.org/txt.php?id={book_id}/"
+            params = {"id": book_id}
+            book_download_url = "http://tululu.org/txt.php"
 
             response = requests.get(book_url)
 
@@ -157,6 +158,7 @@ def main():
                     book_filepath = download_txt(
                         book_download_url,
                         f"{book_id}. {book['title']}.txt",
+                        params=params,
                         folder=books_dir,
                     )
                 if not args.skip_imgs:
