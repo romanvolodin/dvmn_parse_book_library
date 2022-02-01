@@ -23,8 +23,11 @@ def parse_arguments():
         "-e",
         "--end_page",
         type=int,
-        default=702,
-        help="По какую страницу скачивать книги (не включительно). По умолчанию: 702",
+        default=0,
+        help=(
+            "По какую страницу скачивать книги (не включительно). "
+            "По умолчанию: 0 (будут скачаны все доступные страницы)"
+        ),
     )
     parser.add_argument(
         "--dest_folder",
@@ -93,6 +96,14 @@ def parse_category_page(html_page, base_url):
     return book_urls
 
 
+def parse_last_category_page_id(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    check_for_redirect(response)
+    soup = BeautifulSoup(response.text, "lxml")
+    return int(soup.select_one("#content p a:last-child").text)
+
+
 def download_txt(url, filename, params=None, folder="books/"):
     response = requests.get(url, params)
     response.raise_for_status()
@@ -130,7 +141,18 @@ def main():
     if not args.skip_imgs:
         os.makedirs(images_dir, exist_ok=True)
 
-    for page in range(args.start_page, args.end_page):
+    end_page = args.end_page
+    if not end_page:
+        try:
+            end_page = parse_last_category_page_id("http://tululu.org/l55/1")
+        except requests.HTTPError:
+            end_page = args.start_page + 10
+            print(
+                "Не удалось получить количество доступных страниц.\n"
+                f"Попробуем скачать страницы с {args.start_page} по {end_page}"
+            )
+
+    for page in range(args.start_page, end_page):
         scifi_books_url = f"http://tululu.org/l55/{page}"
         response = requests.get(scifi_books_url)
 
