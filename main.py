@@ -133,9 +133,9 @@ def main():
     for page in range(args.start_page, args.end_page):
         scifi_books_url = f"http://tululu.org/l55/{page}"
         response = requests.get(scifi_books_url)
-        response.raise_for_status()
 
         try:
+            response.raise_for_status()
             check_for_redirect(response)
         except requests.HTTPError:
             continue
@@ -148,9 +148,9 @@ def main():
             book_download_url = f"http://tululu.org/txt.php?id={book_id}/"
 
             response = requests.get(book_url)
-            response.raise_for_status()
 
             try:
+                response.raise_for_status()
                 check_for_redirect(response)
                 book = parse_book_page(response.text, response.url)
                 if not args.skip_txt:
