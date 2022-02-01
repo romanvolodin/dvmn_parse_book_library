@@ -25,7 +25,7 @@ def parse_arguments():
         type=int,
         default=0,
         help=(
-            "По какую страницу скачивать книги (не включительно). "
+            "По какую страницу скачивать книги. "
             "По умолчанию: 0 (будут скачаны все доступные страницы)"
         ),
     )
@@ -152,7 +152,7 @@ def main():
                 f"Попробуем скачать страницы с {args.start_page} по {end_page}"
             )
 
-    for page in range(args.start_page, end_page):
+    for page in range(args.start_page, end_page + 1):
         scifi_books_url = f"http://tululu.org/l55/{page}"
         response = requests.get(scifi_books_url)
 
