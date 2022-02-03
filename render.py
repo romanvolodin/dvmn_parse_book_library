@@ -10,6 +10,7 @@ def on_reload():
 
     for book in books:
         book["img_src"] = book["img_src"].replace("scifi_books/", "")
+        book["book_path"] = book["book_path"].replace("scifi_books/", "")
 
     env = Environment(
         loader=FileSystemLoader("./templates"),
