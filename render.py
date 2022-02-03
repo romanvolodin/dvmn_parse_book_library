@@ -21,9 +21,15 @@ def on_reload():
     template = env.get_template("index.html")
 
     os.makedirs("scifi_books/pages", exist_ok=True)
-
-    for page_number, page_books in enumerate(list(chunked(books, 12)), start=1):
-        page = template.render({"books": page_books})
+    chuncked_books = list(chunked(books, 12))
+    for page_number, page_books in enumerate(chuncked_books, start=1):
+        page = template.render(
+            {
+                "books": page_books,
+                "page_count": len(chuncked_books),
+                "current_page": page_number,
+            }
+        )
         with open(f"scifi_books/pages/index{page_number}.html", "w") as file:
             file.write(page)
 
