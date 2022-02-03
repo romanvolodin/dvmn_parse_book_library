@@ -1,7 +1,9 @@
 import json
+import os
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server, shell
+from more_itertools import chunked
 
 
 def on_reload():
@@ -17,10 +19,13 @@ def on_reload():
         autoescape=select_autoescape(["html", "xml"]),
     )
     template = env.get_template("index.html")
-    page = template.render({"books": books})
 
-    with open("scifi_books/index.html", "w") as file:
-        file.write(page)
+    os.makedirs("scifi_books/pages", exist_ok=True)
+
+    for page_number, page_books in enumerate(list(chunked(books, 12)), start=1):
+        page = template.render({"books": page_books})
+        with open(f"scifi_books/pages/index{page_number}.html", "w") as file:
+            file.write(page)
 
 
 if __name__ == "__main__":
