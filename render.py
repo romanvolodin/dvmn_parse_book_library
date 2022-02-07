@@ -31,6 +31,8 @@ def on_reload():
                 "current_page": page_number,
             }
         )
+        if page_number == 1:
+            page_number = ""
         with open(f"scifi_books/pages/index{page_number}.html", "w") as file:
             file.write(page)
     copy_tree("templates/assets", "scifi_books/pages/assets")
