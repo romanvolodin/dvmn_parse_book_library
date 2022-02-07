@@ -1,5 +1,6 @@
 import json
 import os
+from distutils.dir_util import copy_tree
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server, shell
@@ -32,6 +33,7 @@ def on_reload():
         )
         with open(f"scifi_books/pages/index{page_number}.html", "w") as file:
             file.write(page)
+    copy_tree("templates/assets", "scifi_books/pages/assets")
 
 
 if __name__ == "__main__":
