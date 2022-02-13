@@ -32,7 +32,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def on_reload(dest_folder="scifi_books", json_path="scifi_books/books.json"):
+def render_webpages(dest_folder="scifi_books", json_path="scifi_books/books.json"):
     with open(json_path, "r") as file:
         books = json.load(file)
 
@@ -62,9 +62,9 @@ def on_reload(dest_folder="scifi_books", json_path="scifi_books/books.json"):
 if __name__ == "__main__":
     args = parse_arguments()
     json_path = os.path.join(args.dest_folder, args.json_path)
-    on_reload(args.dest_folder, json_path)
+    render_webpages(args.dest_folder, json_path)
 
     if args.livereload:
         server = Server()
-        server.watch("templates/*.html", on_reload)
+        server.watch("templates/*.html", render_webpages)
         server.serve(root=f"{args.dest_folder}")
