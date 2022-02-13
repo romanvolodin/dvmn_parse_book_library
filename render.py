@@ -1,6 +1,7 @@
 import argparse
 import json
 from distutils.dir_util import copy_tree
+import os
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server
@@ -20,7 +21,7 @@ def parse_arguments():
     parser.add_argument(
         "--json_path",
         type=str,
-        default="scifi_books/books.json",
+        default="books.json",
         help="Путь к JSON-файлу с результатами. По умолчанию: scifi_books/books.json",
     )
     parser.add_argument(
@@ -63,7 +64,8 @@ def on_reload(dest_folder="scifi_books", json_path="scifi_books/books.json"):
 
 if __name__ == "__main__":
     args = parse_arguments()
-    on_reload(args.dest_folder, args.json_path)
+    json_path = os.path.join(args.dest_folder, args.json_path)
+    on_reload(args.dest_folder, json_path)
 
     if args.livereload:
         server = Server()
