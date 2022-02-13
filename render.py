@@ -32,15 +32,19 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def load_template(path, name):
+    env = Environment(
+        loader=FileSystemLoader(path),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
+    return env.get_template(name)
+
+
 def render_webpages(dest_folder="scifi_books", json_path="scifi_books/books.json"):
     with open(json_path, "r") as file:
         books = json.load(file)
-
-    env = Environment(
-        loader=FileSystemLoader("./templates"),
-        autoescape=select_autoescape(["html", "xml"]),
-    )
-    template = env.get_template("index.html")
+    templates_path = "templates"
+    template = load_template(templates_path, "index.html")
 
     books_per_page = 12
     chuncked_books = list(chunked(books, books_per_page))
@@ -56,7 +60,7 @@ def render_webpages(dest_folder="scifi_books", json_path="scifi_books/books.json
             page_number = ""
         with open(f"{dest_folder}/index{page_number}.html", "w") as file:
             file.write(page)
-    copy_tree("templates/assets", f"{dest_folder}/assets")
+    copy_tree(f"{templates_path}/assets", f"{dest_folder}/assets")
 
 
 if __name__ == "__main__":
