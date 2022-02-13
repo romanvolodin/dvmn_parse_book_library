@@ -42,7 +42,8 @@ def on_reload(dest_folder="scifi_books", json_path="scifi_books/books.json"):
     )
     template = env.get_template("index.html")
 
-    chuncked_books = list(chunked(books, 12))
+    books_per_page = 12
+    chuncked_books = list(chunked(books, books_per_page))
     for page_number, page_books in enumerate(chuncked_books, start=1):
         page = template.render(
             {
