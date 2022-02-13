@@ -48,7 +48,7 @@ def parse_arguments():
     parser.add_argument(
         "--json_path",
         type=str,
-        default="./books.json",
+        default="scifi_books/books.json",
         help="Путь к JSON-файлу с результатами. По умолчанию: scifi_books/books.json",
     )
     return parser.parse_args()
@@ -130,11 +130,14 @@ def download_image(url, params=None, folder="images/"):
 def main():
     args = parse_arguments()
 
-    books_dir = f"{args.dest_folder}/books"
-    images_dir = f"{args.dest_folder}/images"
-    book_database_filepath = f"{args.dest_folder}/{args.json_path}"
+    books_dir = "books"
+    images_dir = "images"
+    book_database_filepath = "books.json"
 
     book_database = []
+
+    os.makedirs(args.dest_folder, exist_ok=True)
+    os.chdir(args.dest_folder)
 
     if not args.skip_txt:
         os.makedirs(books_dir, exist_ok=True)

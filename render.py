@@ -35,9 +35,9 @@ def on_reload(dest_folder="scifi_books", json_path="scifi_books/books.json"):
     with open(json_path, "r") as file:
         books = json.load(file)
 
-    for book in books:
-        book["img_src"] = book["img_src"].replace(f"{dest_folder}/", "")
-        book["book_path"] = book["book_path"].replace(f"{dest_folder}/", "")
+    # for book in books:
+    #     book["img_src"] = book["img_src"].replace(f"{dest_folder}/", "")
+    #     book["book_path"] = book["book_path"].replace(f"{dest_folder}/", "")
 
     env = Environment(
         loader=FileSystemLoader("./templates"),
