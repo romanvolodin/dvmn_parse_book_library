@@ -15,29 +15,25 @@
             <nav class="mt-3 d-flex justify-content-center">
                 <ul class="pagination">
                     {% for page in range(1, page_count+1) %}
-
-                    {% if loop.first %}
-                    <li class="page-item {% if current_page-1 <= 0 %}disabled{% endif %}">
-                        <a class="page-link" href="index{% if current_page-1 != 1 %}{{current_page-1}}{% endif %}.html">
-                            Предыдущая
-                        </a>
-                    </li>
-                    {% endif %}
-
-                    <li class="page-item {% if page == current_page %}active{% endif%}">
-                        <a class="page-link" href="index{% if page != 1 %}{{page}}{% endif %}.html">
-                            {{ page }}
-                        </a>
-                    </li>
-
-                    {% if loop.last %}
-                    <li class="page-item {% if current_page >= page_count %}disabled{% endif %}">
-                        <a class="page-link" href="index{{current_page+1}}.html">
-                            Следующая
-                        </a>
-                    </li>
-                    {% endif %}
-
+                        {% if loop.first %}
+                            <li class="page-item {% if current_page-1 <= 0 %}disabled{% endif %}">
+                                <a class="page-link" href="index{% if current_page-1 != 1 %}{{current_page-1}}{% endif %}.html">
+                                    Предыдущая
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="page-item {% if page == current_page %}active{% endif%}">
+                            <a class="page-link" href="index{% if page != 1 %}{{page}}{% endif %}.html">
+                                {{ page }}
+                            </a>
+                        </li>
+                        {% if loop.last %}
+                            <li class="page-item {% if current_page >= page_count %}disabled{% endif %}">
+                                <a class="page-link" href="index{{current_page+1}}.html">
+                                    Следующая
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </nav>
@@ -45,26 +41,26 @@
         <div class="row">
             <div class="col-12 d-flex flex-wrap justify-content-center gap-3">
                 {% for book in books %}
-                <div class="card" style="width: 30%">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="{{ book.img_src }}" class="img-fluid rounded-start"
-                                alt="Обложка для книги {{ book.title }}">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ book.title }}</h5>
-                                <p class="card-text">{{ book.author }}</p>
-                                <p>
-                                    {% for genre in book.genres %}
-                                    <span class="badge bg-light text-dark">{{ genre }}</span>
-                                    {% endfor %}
-                                </p>
-                                <a href="{{ book.book_path}}" target="blank" class="card-text">Читать книгу</a>
+                    <div class="card" style="width: 30%">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="{{ book.img_src }}" class="img-fluid rounded-start"
+                                    alt="Обложка для книги {{ book.title }}">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ book.title }}</h5>
+                                    <p class="card-text">{{ book.author }}</p>
+                                    <p>
+                                        {% for genre in book.genres %}
+                                            <span class="badge bg-light text-dark">{{ genre }}</span>
+                                        {% endfor %}
+                                    </p>
+                                    <a href="{{ book.book_path}}" target="blank" class="card-text">Читать книгу</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 {% endfor %}
             </div>
         </div>

@@ -58,6 +58,7 @@ def render_webpages(dest_folder="scifi_books", json_path="scifi_books/books.json
 
     books_per_page = 12
     chuncked_books = list(chunked(books, books_per_page))
+
     for page_number, page_books in enumerate(chuncked_books, start=1):
         page = template.render(
             {
@@ -70,12 +71,14 @@ def render_webpages(dest_folder="scifi_books", json_path="scifi_books/books.json
             page_number = ""
         with open(f"{dest_folder}/index{page_number}.html", "w") as file:
             file.write(page)
+
     copy_tree(f"{templates_path}/assets", f"{dest_folder}/assets")
 
 
 if __name__ == "__main__":
     args = parse_arguments()
     json_path = os.path.join(args.dest_folder, args.json_path)
+
     error = render_webpages(args.dest_folder, json_path)
     if error:
         print(error)
