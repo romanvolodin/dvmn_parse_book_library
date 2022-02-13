@@ -32,8 +32,8 @@ def parse_arguments():
     parser.add_argument(
         "--dest_folder",
         type=str,
-        default=".",
-        help="Путь в каталогу с результатами парсинга. По умолчанию: . (текущий каталог)",
+        default="scifi_books",
+        help="Путь в каталогу с результатами парсинга. По умолчанию: scifi_books",
     )
     parser.add_argument(
         "--skip_imgs",
@@ -49,7 +49,7 @@ def parse_arguments():
         "--json_path",
         type=str,
         default="./books.json",
-        help="Путь к JSON-файлу с результатами. По умолчанию: ./books.json",
+        help="Путь к JSON-файлу с результатами. По умолчанию: scifi_books/books.json",
     )
     return parser.parse_args()
 
