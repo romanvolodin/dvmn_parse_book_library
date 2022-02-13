@@ -1,10 +1,9 @@
 import argparse
 import json
-import os
 from distutils.dir_util import copy_tree
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from livereload import Server, shell
+from livereload import Server
 from more_itertools import chunked
 
 
@@ -32,7 +31,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def on_reload(dest_folder, json_path):
+def on_reload(dest_folder="scifi_books", json_path="scifi_books/books.json"):
     with open(json_path, "r") as file:
         books = json.load(file)
 
@@ -46,7 +45,6 @@ def on_reload(dest_folder, json_path):
     )
     template = env.get_template("index.html")
 
-    os.makedirs(f"{dest_folder}/pages", exist_ok=True)
     chuncked_books = list(chunked(books, 12))
     for page_number, page_books in enumerate(chuncked_books, start=1):
         page = template.render(
@@ -58,9 +56,9 @@ def on_reload(dest_folder, json_path):
         )
         if page_number == 1:
             page_number = ""
-        with open(f"{dest_folder}/pages/index{page_number}.html", "w") as file:
+        with open(f"{dest_folder}/index{page_number}.html", "w") as file:
             file.write(page)
-    copy_tree("templates/assets", f"{dest_folder}/pages/assets")
+    copy_tree("templates/assets", f"{dest_folder}/assets")
 
 
 if __name__ == "__main__":
@@ -69,5 +67,5 @@ if __name__ == "__main__":
 
     if args.livereload:
         server = Server()
-        server.watch("templates/*.html", shell("make html", cwd="docs"))
-        server.serve(root=f"{args.dest_folder}/")
+        server.watch("templates/*.html", on_reload)
+        server.serve(root=f"{args.dest_folder}")

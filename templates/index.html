@@ -48,7 +48,7 @@
                 <div class="card" style="width: 30%">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="../{{ book.img_src }}" class="img-fluid rounded-start"
+                            <img src="{{ book.img_src }}" class="img-fluid rounded-start"
                                 alt="Обложка для книги {{ book.title }}">
                         </div>
                         <div class="col-md-8">
@@ -60,7 +60,7 @@
                                     <span class="badge bg-light text-dark">{{ genre }}</span>
                                     {% endfor %}
                                 </p>
-                                <a href="../{{ book.book_path}}" target="blank" class="card-text">Читать книгу</a>
+                                <a href="{{ book.book_path}}" target="blank" class="card-text">Читать книгу</a>
                             </div>
                         </div>
                     </div>
