@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 from distutils.dir_util import copy_tree
@@ -5,6 +6,30 @@ from distutils.dir_util import copy_tree
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server, shell
 from more_itertools import chunked
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Скрипт генерации сайта c книгами для локального просмотра.",
+    )
+    parser.add_argument(
+        "--dest_folder",
+        type=str,
+        default="scifi_books",
+        help="Путь в каталогу с результатами парсинга. По умолчанию: scifi_books",
+    )
+    parser.add_argument(
+        "--json_path",
+        type=str,
+        default="scifi_books/books.json",
+        help="Путь к JSON-файлу с результатами. По умолчанию: scifi_books/books.json",
+    )
+    parser.add_argument(
+        "--livereload",
+        action="store_true",
+        help="Запустить автоматическую генерацию страниц при обновлении. Удобно при разработке.",
+    )
+    return parser.parse_args()
 
 
 def on_reload():
@@ -39,8 +64,10 @@ def on_reload():
 
 
 if __name__ == "__main__":
+    args = parse_arguments()
     on_reload()
 
-    server = Server()
-    server.watch("templates/*.html", shell("make html", cwd="docs"))
-    server.serve(root="scifi_books/")
+    if args.livereload:
+        server = Server()
+        server.watch("templates/*.html", shell("make html", cwd="docs"))
+        server.serve(root=f"{args.dest_folder}/")
