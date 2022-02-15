@@ -32,14 +32,6 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def load_json(path):
-    try:
-        with open(path, "r") as file:
-            return json.load(file)
-    except json.decoder.JSONDecodeError:
-        return
-
-
 def load_template(path, name):
     env = Environment(
         loader=FileSystemLoader(path),
@@ -49,9 +41,8 @@ def load_template(path, name):
 
 
 def render_webpages(dest_folder="scifi_books", json_path="scifi_books/books.json"):
-    books = load_json(json_path)
-    if not books:
-        return f"Ошибка чтения файла {json_path}"
+    with open(json_path, "r") as file:
+        books = json.load(file)
 
     templates_path = "templates"
     template = load_template(templates_path, "index.html")
