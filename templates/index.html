@@ -56,7 +56,7 @@
                                             <span class="badge bg-light text-dark">{{ genre }}</span>
                                         {% endfor %}
                                     </p>
-                                    <a href="{{ book.book_path}}" target="blank" class="card-text">Читать книгу</a>
+                                    <a href="{{ book.book_path | urlencode }}" target="blank" class="card-text">Читать книгу</a>
                                 </div>
                             </div>
                         </div>
