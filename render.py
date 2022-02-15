@@ -70,9 +70,10 @@ if __name__ == "__main__":
     args = parse_arguments()
     json_path = os.path.join(args.dest_folder, args.json_path)
 
-    error = render_webpages(args.dest_folder, json_path)
-    if error:
-        print(error)
+    try:
+        render_webpages(args.dest_folder, json_path)
+    except json.decoder.JSONDecodeError:
+        exit(f"Ошибка чтения файла {json_path}.")
 
     if args.livereload:
         server = Server()
